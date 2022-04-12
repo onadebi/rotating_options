@@ -1,38 +1,58 @@
 import React, { FormEvent } from "react";
+import agent from "../api/agent";
+import { ApiResponse } from "../models/ApiResponse";
 
 const OptionsSearch = () => {
   const optionInit = ["A", "B", "C", "D", "E"];
   const [search, SetSearch] = React.useState("");
   const [options, SetOptions] = React.useState(optionInit);
-  const handleSubmit = (e: FormEvent<HTMLButtonElement>) => {
+  const [searchResult, SetSearchResult]= React.useState<string[]>([]);
+
+  const handleSearchChange = async (e: FormEvent<HTMLInputElement>)=>{
     e.preventDefault();
-    console.log(JSON.stringify(e.currentTarget.value));
+    SetSearch(e.currentTarget.value);
+    const result = await agent.SearchResult.get<ApiResponse>(search);
+    const searchResults = result.results;
+    if(searchResults.length > 1){
+      const collectionNames = searchResults.map((item)=> (item.collectionName)).sort().slice(0,5);
+      SetSearchResult(collectionNames);
+      console.log(JSON.stringify(searchResult,null,2))
+    }
+  }
+
+  const handleSubmit = (e: FormEvent) => {
+    e.preventDefault();
   };
 
   React.useEffect(() => {
     const optionsChange = setInterval(() => {
       const newOptions = [...options];
-      if (newOptions.length > 1) {
+      
+      if(searchResult.length > 1){
         newOptions.push(newOptions.shift()!);
-        SetOptions(newOptions);
+        SetOptions(searchResult);
+      }else{
+        if (newOptions.length > 1) {
+          newOptions.push(newOptions.shift()!);
+          SetOptions(newOptions);
+        }
       }
     }, 3000);
-    console.log("options after ", options);
     return () => {
       clearInterval(optionsChange);
     };
-  }, [options]);
+  }, [options, searchResult]);
 
   return (
     <>
-      <form onSubmit={() => handleSubmit}>
+      <form onSubmit={ handleSubmit}>
         <br />
         <input
           type="text"
           id="search"
           name="search"
           value={search}
-          onChange={(e) => SetSearch(e.target.value)}
+          onChange={handleSearchChange}
           placeholder="Search item"
         />
         <br />
