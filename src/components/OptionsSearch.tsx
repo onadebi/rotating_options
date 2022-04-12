@@ -12,8 +12,10 @@ const OptionsSearch = () => {
   const handleSearchChange = async (e: FormEvent<HTMLInputElement>) => {
     e.preventDefault();
     SetSearch(e.currentTarget.value);
-    let result: ApiResponse = {resultCount:0, results:[]};
-    try{result = await agent.SearchResult.get<ApiResponse>(search);}catch{}
+    let result: ApiResponse = { resultCount: 0, results: [] };
+    try {
+      result = await agent.SearchResult.get<ApiResponse>(search);
+    } catch {}
     const searchResults = result.results;
     if (searchResults.length > 1) {
       const collectionNames = searchResults
@@ -74,21 +76,24 @@ const OptionsSearch = () => {
           style={{ width: "100%" }}
         />
         <br />
-        {options.map((o, i) => {
-          return (
-            <div
-              key={i}
-              style={{
-                width: "100%",
-                margin: " 0.5em auto",
-                textAlign: "center",
-                border: "1px solid gray",
-              }}
-            >
-              {o}
-            </div>
-          );
-        })}
+        <div style={{ backgroundColor: "#ececec", padding:'15px',borderRadius:'8px' }}>
+          {options.map((o, i) => {
+            return (
+              <div
+                key={i}
+                style={{
+                  width: "100%",
+                  margin: " 0.5em auto",
+                  textAlign: "center",
+                  border: "1px solid gray",
+                  backgroundColor:'#fff'
+                }}
+              >
+                {o}
+              </div>
+            );
+          })}
+        </div>
       </div>
     </>
   );
