@@ -1,4 +1,3 @@
-import { debug } from "console";
 import React, { FormEvent } from "react";
 import agent from "../api/agent";
 import { ApiResponse } from "../models/ApiResponse";
@@ -13,7 +12,8 @@ const OptionsSearch = () => {
   const handleSearchChange = async (e: FormEvent<HTMLInputElement>) => {
     e.preventDefault();
     SetSearch(e.currentTarget.value);
-    const result = await agent.SearchResult.get<ApiResponse>(search);
+    let result: ApiResponse = {resultCount:0, results:[]};
+    try{result = await agent.SearchResult.get<ApiResponse>(search);}catch{}
     const searchResults = result.results;
     if (searchResults.length > 1) {
       const collectionNames = searchResults
@@ -25,25 +25,19 @@ const OptionsSearch = () => {
     }
   };
 
-  // const handleSubmit = (e: FormEvent) => {
-  //   e.preventDefault();
-  // };
-
   React.useEffect(() => {
     const optionsChange = setInterval(() => {
       let newOptions = [...options];
 
       if (searchResult.length > 1) {
         console.log("Search result for replacement ", searchResult);
-        debugger;
-        const searchResponse = [...searchResult];
-        debugger;
+
         newOptions.shift()!;
-        debugger;
+
         newOptions.push(searchResult[index]);
 
         SetOptions(newOptions);
-        debugger;
+
         const indexValue = index < searchResult.length - 1 ? index + 1 : 0;
         console.log("INdex Value is ", indexValue);
         SetIndex(indexValue);
@@ -53,7 +47,7 @@ const OptionsSearch = () => {
           SetOptions(newOptions);
         }
       }
-    }, 3000);
+    }, 1000);
     return () => {
       clearInterval(optionsChange);
     };
@@ -77,7 +71,7 @@ const OptionsSearch = () => {
           onChange={handleSearchChange}
           onBlur={handleSearchChange}
           placeholder="Search Band"
-          style={{width:'100%'}}
+          style={{ width: "100%" }}
         />
         <br />
         {options.map((o, i) => {
